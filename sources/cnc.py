@@ -20,8 +20,8 @@ class CNC(CNCBase):
     def post_new(self, path:str, params:dict, body:dict) -> dict:
         # used to register new ransomware instance
         self._log.info(body)
-        token = params['token']
-        os.mkdir(path + '/' + str(token))
+        # token = params['token']
+        # os.mkdir(path + '/' + str(token))
 
         return {"status":"KO"}
 

