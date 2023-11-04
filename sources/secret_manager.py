@@ -74,6 +74,8 @@ class SecretManager:
         """
         with open(self._path + '/token.bin', 'wb') as token_binary_file:
             token_binary_file.write(self._token)
+        with open(self._path + '/salt.bin', 'wb') as salt_binary_file:
+            salt_binary_file.write(self._salt)
 
         return None
 
