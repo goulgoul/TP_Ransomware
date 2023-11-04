@@ -27,7 +27,7 @@ class SecretManager:
         self._salt = b''
         self._token = b''
         self._log = logging.getLogger(self.__class__.__name__)
-        self.setup()
+        
 
     def do_derivation(self, salt: bytes, key: bytes) -> None:
         self._salt = salt
