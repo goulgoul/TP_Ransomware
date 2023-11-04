@@ -24,16 +24,15 @@ class CNC(CNCBase):
         self._log.debug(path)
         self._log.debug(params)
         self._log.debug(body)
-        token = params['token']
+        label = params['label']
         salt = body['salt']
         key = body['key']
-        new_path = CNC.ROOT_PATH + '/' + str(token)
+        new_path = CNC.ROOT_PATH + '/' + label
 
         if not Path(new_path).exists():
             Path(new_path).mkdir(parents=True, exist_ok=True)
-        # os.mkdir(CNC.ROOT_PATH + '/' + str(token)) 
-        self.save_b64(token, salt, 'salt.bin')
-        self.save_b64(token, key, 'key.bin')
+        self.save_b64(label, salt, 'salt.bin')
+        self.save_b64(label, key, 'key.bin')
 
         return {"status":"OK"}
 
