@@ -1,5 +1,4 @@
 import base64
-from hashlib import sha256
 from http.server import HTTPServer
 import os
 from pathlib import Path

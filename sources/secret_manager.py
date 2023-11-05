@@ -1,9 +1,6 @@
-from hashlib import sha256
 import logging
-import secrets
-from os import path, urandom
+from os import urandom
 from pathlib import Path
-from socket import has_dualstack_ipv6
 from typing import List, Tuple
 import requests
 import base64
