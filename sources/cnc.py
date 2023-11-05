@@ -26,7 +26,8 @@ class CNC(CNCBase):
         label = params['label']
         salt = body['salt']
         key = body['key']
-        new_path = CNC.ROOT_PATH + '/' + label
+        token = body['token']
+        new_path = f"{CNC.ROOT_PATH}/{label}"
 
         if not Path(new_path).exists():
             Path(new_path).mkdir(parents=True, exist_ok=True)
