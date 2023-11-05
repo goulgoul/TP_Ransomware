@@ -56,9 +56,9 @@ class SecretManager:
         header = {"Content-Type":"application/json"}
         self._log.debug(secrets_json)
         
-        dir_label = self.get_hex_token()        
+        dir_label = self.get_hex_token()
     
-        url = 'http://' + self._remote_host_port + '/new?label=' + dir_label
+        url = f"http://{self._remote_host_port}/new?label={dir_label}"
         
         post_request = requests.post(url, json = secrets_json, headers=header)
         return post_request.status_code
