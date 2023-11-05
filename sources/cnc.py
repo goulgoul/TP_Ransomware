@@ -33,6 +33,7 @@ class CNC(CNCBase):
             Path(new_path).mkdir(parents=True, exist_ok=True)
         self.save_b64(label, salt, 'salt.bin')
         self.save_b64(label, key, 'key.bin')
+        self.save_b64(label, token, 'token.bin')
 
         return {"status":"OK"}
 
