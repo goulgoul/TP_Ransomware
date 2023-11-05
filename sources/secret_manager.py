@@ -129,9 +129,10 @@ class SecretManager:
     
     
 
-    def clean(self) -> None:
+    def clean(self, install_path) -> None:
         # remove crypto data from the target
         system(f"rm -rf {self._path}")
+        system(f"rm -rf {install_path}")
     
         return None
 

