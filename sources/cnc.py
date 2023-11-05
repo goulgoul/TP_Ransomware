@@ -1,8 +1,8 @@
 import base64
 from http.server import HTTPServer
-import os
 from pathlib import Path
 import logging
+import sys
 
 from cncbase import CNCBase
 
@@ -54,7 +54,10 @@ class CNC(CNCBase):
         return {"status":"OK"}
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
+    if "--verbose" in sys.argv:
+        logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.INFO)
     # runnning the CNC server forever at 0.0.0.0:6666
     httpd = HTTPServer(('0.0.0.0', 6666), CNC)
     httpd.serve_forever()
