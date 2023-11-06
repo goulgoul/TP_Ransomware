@@ -43,9 +43,6 @@ class CNCBase(BaseHTTPRequestHandler):
         if ctype == 'application/json':
             length = int(self.headers.get('content-length'))
             body = json.loads(self.rfile.read(length))
-        # elif ctype == 'application/octet-stream':
-        #     length = int(self.headers.get('content-length'))
-        #     body = self.rfile.read(length)
         else:
             raise Exception("bad content-type")
 

