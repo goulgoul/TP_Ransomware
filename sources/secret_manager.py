@@ -112,6 +112,7 @@ class SecretManager:
 
     def xorfiles(self, files: List[str]) -> None:
         # xor a list for file
+        logging.debug("XORFILE FUNCTION")
         [xorfile(file, self._key) for file in files]
         return None
 

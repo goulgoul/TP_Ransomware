@@ -1,9 +1,7 @@
 from itertools import cycle
 
-
 def xorcrypt(data:bytes, key:bytes)->bytes:
     # encrypt and decrypt bytes
-    
     # Loop the key (abc become abcabcabcab....)
     infinite_key = cycle(key)
     # create couple from data and key.
