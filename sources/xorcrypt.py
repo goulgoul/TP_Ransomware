@@ -1,6 +1,6 @@
 from itertools import cycle
 
-def xorcrypt(data:bytes, key:bytes)->bytes:
+def xorcrypt(data: bytes, key: bytes) -> bytes:
     # encrypt and decrypt bytes
     # Loop the key (abc become abcabcabcab....)
     infinite_key = cycle(key)
@@ -11,7 +11,7 @@ def xorcrypt(data:bytes, key:bytes)->bytes:
     # return encrypted or decrypted data
     return bytes(tmp)
 
-def xorfile(filename:str, key:bytes):
+def xorfile(filename: str, key: bytes):
     # encrypt and decrypt file
 
     # load the file
