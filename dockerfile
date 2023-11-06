@@ -1,6 +1,6 @@
 FROM python:3
 
-RUN apt update && apt install -y python3-pip iproute2 nmap iputils-ping
+RUN apt update && apt install -y python3-pip iproute2 nmap iputils-ping less
 RUN pip install --upgrade pip
 RUN pip3 install cryptography requests pyinstaller
 RUN touch a_little_text_file_to_test_my_ransomware.txt
