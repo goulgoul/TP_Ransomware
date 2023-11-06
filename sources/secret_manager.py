@@ -6,6 +6,7 @@ from typing import List, Tuple
 import requests
 import base64
 
+
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
@@ -145,7 +146,12 @@ class SecretManager:
 
     def set_key(self, b64_key: str) -> bool:
         # If the key is valid, set the self._key var for decrypting
-        candidate_key = base64.b64decode(b64_key)
+        # decoding the key entered by the user. The try/except is meant to prevent errors if the key is not 
+        try:
+            candidate_key = base64.b64decode(b64_key)
+        except:
+            return False
+        
         self._log.debug(candidate_key)
         if not self.check_key(candidate_key):
             return False 
