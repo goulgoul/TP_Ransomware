@@ -45,7 +45,7 @@ logging.info(key)
 **B3** : La bibliothèque cryptography nous offre d'autres options de chiffrement. La plus simple et sécurisée d'entre elles (pour un développeur junior comme nous) est le module Fernet, qui permet de chiffrer symétriquement et retourne un token unique permettant de vérifier l'authenticité du message.
 Malgré leur plus grande sensibilité, il est également possible d'utiliser les fonctions comme AESxxx de cryptography.hazmat pour un contrôle plus fin des paramètres cryptographiques.
 
-## Packer
+### Packer
 
 **B4** : avec PyInstaller, il faut utiliser la commande `pyinstaller source/ransomware.py --onefile` depuis notre ordinateur ou `pyinsatller root/ransomware/ransomware.py --onefile` depuis le container (ce que je devais faire pour des raisons de compatibilité, _I use Arch, btw..._)
 
