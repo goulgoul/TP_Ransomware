@@ -20,6 +20,24 @@ Il serait plus efficace d'utiliser un chiffrement robuste, comme les variantes d
 
 ## Bonus
 
+### Chiffrement
+
+**B2** : La clé utilisée pour le XOR étant cyclique, il est possible de connaître la clé en compaprant un fichier sain avec un fichier chiffré. 
+Donnée ^ Clé = Chiffré ; Chiffré ^ Clé = Donnée
+Data ^ Chiffré = Clé
+Ainsi, un script permettant de trouver la clédu chiffrement serait aussi simple que :
+```py
+with open(clear_file as c):
+    clear_data = c.read()
+with open(encrypted_data as e):
+    encrypted_data = e.read()
+key = clear_data ^ encrypted_data
+
+logging.info(key)
+```
+
+**B3** : La bibliothèque cryptography nous offre d'autres options de chiffrement. La plus simple et sécurisée d'entre elles (pour un développeur junior comme nous) est le module Fernet, qui permet de chiffrer symétriquement et retourne un token unique permettant de vérifier l'authenticité du message.
+
 ### Vol de fichiers
 
 Pour voler les fichiers, on peut lire les données de chaque fichier chiffré, les convertir en base 64 et les récupérer sur le CNC 
