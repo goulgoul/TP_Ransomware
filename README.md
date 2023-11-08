@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Ce devoir consiste en la fabrication guidée d'un ransomware. Les fonctionnalités seront détaillées dans les paragraphes suivants. S'y ajouteront des notes complémentaires sur ce que j'aurais voulu ajouter, en eus-je pris le temps plus tôt. 
+Ce devoir consiste en l'élaboration guidée d'un ransomware (programme malveillant chiffrant les fichiers d'un système, voire pire, demandant une rançon aux victimes contre la restauration de leurs données) Les fonctionnalités seront détaillées dans les paragraphes suivants. S'y ajouteront des notes complémentaires sur ce que j'aurais voulu ajouter, en eus-je pris le temps plus tôt. 
 À l'instar des commentaires présents dans les autres documents de ce dépôt, tous on été écrits en anglais par souci d'homogénéité et de cohérence.
 
 ## Corps du ransomware
